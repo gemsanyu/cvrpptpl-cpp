@@ -14,8 +14,9 @@ struct Node
 {
     int idx {};
     Coord coord;
+    int service_time;
     Node(){};
-    Node(int idx, Coord coord);
+    Node(int idx, int service_time, Coord coord);
     Node(std::string input_line);
 };
 

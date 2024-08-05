@@ -66,29 +66,41 @@ Cvrpptpl::Cvrpptpl(std::string filename){
     std::vector<std::string> input_lines = read_input_lines(filename);
     Input input{input_lines};
     this->vehicles = read_instances<Vehicle>(input.vehicle_input_lines);
-    Node depot{input.depot_input_line};
+    this->depot = Node(input.depot_input_line);
     auto hd_customers = read_instances<Customer>(input.home_delivery_customer_input_lines);
     auto sp_customers = read_instances<Customer>(input.self_pickup_customer_input_lines);
     auto fx_customers = read_instances<Customer>(input.flexible_customer_input_lines);
     for (auto& fx_customer: fx_customers){
         fx_customer.is_flexible = true;
     }
-    auto lockers = read_instances<Locker>(input.locker_input_lines);
-    this->nodes.push_back(depot);
-    this->nodes.insert(this->nodes.end(), hd_customers.begin(), hd_customers.end());
-    this->nodes.insert(this->nodes.end(), sp_customers.begin(), sp_customers.end());
-    this->nodes.insert(this->nodes.end(), fx_customers.begin(), fx_customers.end());
-    this->nodes.insert(this->nodes.end(), lockers.begin(), lockers.end());
+    this->customers.insert(this->customers.end(), hd_customers.begin(), hd_customers.end());
+    this->customers.insert(this->customers.end(), sp_customers.begin(), sp_customers.end());
+    this->customers.insert(this->customers.end(), fx_customers.begin(), fx_customers.end());
+    this->lockers = read_instances<Locker>(input.locker_input_lines);
     this->mrt_lines = read_instances<Mrt_line>(input.mrt_line_input_lines);
     this->distance_matrix = read_distance_matrix(input.distance_matrix_lines);
-    for (auto& dm: this->distance_matrix){
-        for (auto& d: dm){
-            std::cout<<d<<" ";
-        }
-        std::cout<<"\n";
-    }
-    
+
+    this->num_home_delivery_customers = hd_customers.size();
+    this->num_self_pickup_customers = sp_customers.size();
+    this->num_flexible_customers = fx_customers.size();
+    this->num_customers = this->num_home_delivery_customers + this->num_self_pickup_customers + this->num_flexible_customers;
+    this->num_lockers = lockers.size();
+    this->num_nodes = this->num_customers + this->num_lockers + 1;
+    this->num_vehicles = this->vehicles.size();
+    this->num_mrt_lines = this->mrt_lines.size();
 }
+
+const Customer& Cvrpptpl::get_customer(int cust_idx) const
+{
+    return this->customers[cust_idx-1];
+}
+
+const Locker& Cvrpptpl::get_locker(int locker_idx) const
+{
+    locker_idx -= (this->num_customers+1);
+    return this->lockers[locker_idx];
+}
+
 
 std::vector<std::string> read_input_lines(std::string filename)
 {

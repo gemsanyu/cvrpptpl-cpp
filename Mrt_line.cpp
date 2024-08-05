@@ -19,4 +19,3 @@ Mrt_line::Mrt_line(std::string input_line)
     this->capacity = std::stoi(values[2]);
     this->cost = std::stof(values[3]);
 }
-    
